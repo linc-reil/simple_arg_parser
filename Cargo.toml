@@ -2,5 +2,9 @@
 name = "simple_arg_parser"
 version = "0.1.0"
 edition = "2024"
+authors = ["Lincoln Reilly"]
+description = "A simple command line argument parser for Rust. Extends the functionality of std::env::args().collect()."
 
 [dependencies]
+
+[dev-dependencies]
