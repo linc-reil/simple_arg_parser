@@ -4,6 +4,9 @@ version = "0.1.0"
 edition = "2024"
 authors = ["Lincoln Reilly"]
 description = "A simple command line argument parser for Rust. Extends the functionality of std::env::args().collect()."
+license = "LGPL-2.1"
+repository = "https://github.com/linc-reil/simple_arg_parser"
+keywords = ["parser", "cli", "command-line", "library"]
 
 [dependencies]
 
