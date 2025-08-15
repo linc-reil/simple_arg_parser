@@ -1,15 +1,58 @@
+//! simple_arg_parser: Created by Lincoln Reilly.
+//! A simple command-line argument parser for small use cases.
+//! For more complex argument parsing, `clap` is highly recommended.
+
 use std::collections::HashMap;
 use std::env;
-use std::hash::Hash;
 
+/// Argument (`Enum`): Basic identifier for the different types of arguments a program can provide.
+/// Includes Positional, Flag, Option and Variable types. These also include their respective data.
+/// Mainly used as an identifier in the returned vector from the `parse_arguments()` function.
+/// 
+/// # Examples
+/// 
+/// ```
+/// let positional_argument = Argument::Positional("file.txt");     // Positional argument
+/// let flag = Argument::Flag('o');                                 // Flag - notice the single character
+/// let option = Argument::Option("quiet");                         // Option - notice the full name
+/// let variable = Argument::Variable {                             // Variable - contains a name and value, both `String`s.
+///     name: String::from("ignore-warnings"),                      // ...
+///     value: String::from("true")                                 // ...
+/// }
+/// ```
 #[derive(Debug)]
 pub enum Argument {
+    /// A positional argument - the most standard type, e.g. `myprogram file.txt` has the positional argument 'file.txt'.
+    /// Takes a `String` - the name of the positional argument.
     Positional(String),
+    /// A flag - given after a single '-' symbol, can be grouped together. e.g. `myprogram -fo file.txt` has the flags 'f' and 'o'. Seperated for clarity in the Argument enum.
+    /// Takes a `char`: the character as the flag.
     Flag(char),
+    /// An option - expanded out version of a flag given after two '-' symbols, and does not include an '=' sign. e.g. `myprogram file.txt --quiet` has the option 'quiet'.
+    /// Takes a `String`: the name of the option.
     Option(String),
+    /// A variable: flag and a value given by an '=' sign. e.g. `myprogram file.txt --output-type=quiet` has the variable '--output-type' set to 'quiet'.
+    /// Takes a `name: String` and a `value: String` - The name and value of the variable.
     Variable { name: String, value: String },
 }
 
+/// ParsedArguments (`struct`): Ordered arguments structure for developer access.
+/// Provides a higher level access to arguments of a program, including the arguments as a `Vec<Argument>`, the positionals, flags, options, and variables.
+/// Returned by the `parse_arguments()` function.
+/// 
+/// # Examples
+/// 
+/// ```
+/// let testing_arguments: Vec<String> = String::from("file.txt -o file.o --quiet --on-warnings=exit")  // Example arguments
+///     .split_whitespace()                                                                             // ...
+///     .map(|s| s.to_string())                                                                         // ...
+///     .collect();                                                                                     // ...
+/// let parsed_arguments: ParsedArguments = parse_arguments();                                          // Parse the arguments, returning a ParsedArguments struct.
+/// println!(parsed_arguments.positionals)                                                              // Prints `["file.txt", "file.o"]`
+/// println!(parsed_arguments.flags)                                                                    // Prints `[-o']`
+/// println!(parsed_arguments.options)                                                                  // Prints `["quiet"]`
+/// println!(parsed_arguments.variables)                                                                // Prints `[{ "on-warnings": "exit"}]`
+/// ```
 #[derive(Debug)]
 pub struct ParsedArguments {
     arguments: Vec<Argument>,
@@ -19,7 +62,7 @@ pub struct ParsedArguments {
     variables: HashMap<String, String>,
 }
 
-pub trait CheckableIfArgument {
+trait CheckableIfArgument {
     fn is_positional(&self) -> bool;
     fn is_flag(&self) -> bool;
     fn is_option(&self) -> bool;
